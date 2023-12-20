@@ -98,3 +98,16 @@ class Cache:
             int: The data associated with the key.
         """
         return self.get(key, fn=int)
+
+
+def replay(method: Callable):
+    """
+    function to display the history of calls of a particular method.
+    Args:
+        method (Callable): the method to display the history for.
+    """
+    inputs = method.__self__._redis.lrange(f"{method.__qualname__}:inputs", 0, -1)
+    outputs = method.__self__._redis.lrange(f"{method.__qualname__}:outputs", 0, -1)
+    print(f"{method.__qualname__} was called {len(inputs)} times:")
+    for inp, out in zip(inputs, outputs):
+        print(f"{method.__qualname__}{inp.decode('utf-8')} -> {out.decode('utf-8')}")
