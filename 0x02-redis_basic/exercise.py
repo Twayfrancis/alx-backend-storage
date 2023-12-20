@@ -106,8 +106,11 @@ def replay(method: Callable):
     Args:
         method (Callable): the method to display the history for.
     """
-    inputs = method.__self__._redis.lrange(f"{method.__qualname__}:inputs", 0, -1)
-    outputs = method.__self__._redis.lrange(f"{method.__qualname__}:outputs", 0, -1)
-    print(f"{method.__qualname__} was called {len(inputs)} times:")
+    key = method.__qualname__
+    inputs = method.__self__._redis.lrange(f"{key}:inputs", 0, -1)
+    outputs = method.__self__._redis.lrange(f"{key}:outputs", 0, -1)
+    print(f"{key} was called {len(inputs)} times:")
     for inp, out in zip(inputs, outputs):
-        print(f"{method.__qualname__}{inp.decode('utf-8')} -> {out.decode('utf-8')}")
+        inp_str = inp.decode('utf-8')
+        out_str = out.decode('utf-8')
+        print(f"{key}{inp_str} -> {out_str}")
